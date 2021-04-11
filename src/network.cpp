@@ -57,7 +57,7 @@ OP_NAMESPACE_BEGIN
             }
             void OnStart(ChannelService* serv, uint32 idx)
             {
-                serv->GetTimer().Schedule(this, 1, 1000 / g_db->GetConf().hz, MILLIS);
+                serv->GetTimer().Schedule(this, 1, 100000 / g_db->GetConf().hz, MILLIS);
                 g_reply_pool.GetValue().SetMaxSize(g_db->GetConf().reply_pool_size);
             }
             void OnStop(ChannelService* serv, uint32 idx)
