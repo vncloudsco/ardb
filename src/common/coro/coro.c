@@ -116,7 +116,6 @@ trampoline (int sig)
 # endif
 
 # if CORO_ASM
-
   #if _WIN32 || __CYGWIN__
     #define CORO_WIN_TIB 1
   #endif

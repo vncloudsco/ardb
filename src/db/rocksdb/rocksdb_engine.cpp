@@ -1321,12 +1321,16 @@ OP_NAMESPACE_BEGIN
         {
             return;
         }
+// rocksdb 6.2 has moved GetOptions()
+#if 0
         rocksdb::TableFactory* table_factory = m_options.table_factory.get();
         if (NULL != table_factory && !strcmp("BlockBasedTable", table_factory->Name()))
         {
             void* table_opt = table_factory->GetOptions();
             if(NULL != table_opt)
             {
+
+
                 rocksdb::BlockBasedTableOptions* topt = (rocksdb::BlockBasedTableOptions*)table_opt;
                 size_t usage = topt->block_cache->GetUsage();
                 size_t pinned_usage = topt->block_cache->GetPinnedUsage();
@@ -1334,6 +1338,7 @@ OP_NAMESPACE_BEGIN
                 all.append("rocksdb.block_table_pinned_usage").append(":").append(stringfromll(pinned_usage)).append("\r\n");
             }
         }
+#endif
         // all.append("rocksdb_iterator_cache:").append(stringfromll(g_iter_cache.cache_size)).append("\r\n");
         std::map<rocksdb::MemoryUtil::UsageType, uint64_t> usage_by_type;
         std::unordered_set<const rocksdb::Cache*> cache_set;

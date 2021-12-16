@@ -37,10 +37,11 @@ CC=gcc
 ARDB_VERSION=0.10.0
 
 uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
+uname_M := $(shell sh -c 'uname -m 2>/dev/null || echo not')
 
 LIB_PATH=$(PWD)/../deps
 
-JEMALLOC_VER=5.1.0
+JEMALLOC_VER=5.2.1
 JEMALLOC_PATH=${LIB_PATH}/jemalloc-${JEMALLOC_VER}
 JEMALLOC_FILE=${JEMALLOC_PATH}.tar.bz2
 JEMALLOC_REMOTE_FILE=https://github.com/jemalloc/jemalloc/releases/download/${JEMALLOC_VER}/jemalloc-${JEMALLOC_VER}.tar.bz2
@@ -52,7 +53,7 @@ SNAPPY_FILE=${SNAPPY_PATH}.tar.gz
 SNAPPY_REMOTE_FILE=https://github.com/google/snappy/releases/download/${SNAPPY_VER}/snappy-${SNAPPY_VER}.tar.gz
 SNAPPY_LIBA=${SNAPPY_PATH}/.libs/libsnappy.a
 
-ROCKSDB_VER=5.14.2
+ROCKSDB_VER=6.26.1
 ROCKSDB_PATH=${LIB_PATH}/rocksdb-${ROCKSDB_VER}
 ROCKSDB_REMOTE_FILE=https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VER}.tar.gz
 ROCKSDB_FILE=${ROCKSDB_PATH}.tar.gz
@@ -163,8 +164,14 @@ LIBS= ${LUA_LIBA} ${MALLOC_LIBA} ${SNAPPY_LIBA} -lpthread -ldl
 # Default allocator
 ifeq ($(uname_S),Linux)
 	MALLOC=jemalloc
-	CXXFLAGS+=-DCORO_ASM
-	CCFLAGS+=-DCORO_ASM
+	ifeq ($(uname_M),$(filter $(uname_M),x86 x86_64))
+		CXXFLAGS+=-DCORO_ASM
+		CCFLAGS+=-DCORO_ASM
+	else
+		# only have asm support in coro for x86
+		CXXFLAGS+=-DHAVE_SETJMP_H -DHAVE_SIGALTSTACK
+		CCFLAGS+=-DHAVE_SETJMP_H -DHAVE_SIGALTSTACK
+	endif
 	LIBS+=-lrt
 	CXXFLAGS+=-Werror
 else

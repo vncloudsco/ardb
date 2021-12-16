@@ -310,7 +310,7 @@ void coro_stack_free (struct coro_stack *stack);
 # elif defined HAVE_SETJMP_H && defined HAVE_SIGALTSTACK
 #  define CORO_SJLJ 1
 # else
-error unknown or unsupported architecture
+#error unknown or unsupported architecture
 # endif
 #endif
 
@@ -375,7 +375,12 @@ struct coro_context
   void **sp; /* must be at offset 0 */
 };
 
+
+#if (__i386 || __amd64)
 void __attribute__ ((__noinline__, __regparm__(2)))
+#else
+void __attribute__ ((__noinline__))
+#endif
 coro_transfer (coro_context *prev, coro_context *next);
 
 # define coro_destroy(ctx) (void *)(ctx)
